@@ -43,6 +43,7 @@ function App() {
     setInput("");
   };
   console.log(todoList);
+
   return (
     <>
       {/* <ul>
