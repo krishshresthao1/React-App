@@ -1,64 +1,46 @@
 import "./App.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Counter from "./Counter";
 function App() {
-  // const [state, setState] = useState(1);
+  const [quotes, setQuotes] = useState([]);
+  const [charName, setCharName] = useState("Byakuya");
+  const handleSubmit = async () => {
+    if (event.key == "Enter") {
+      const fetchQuote = async () => {
+        try {
+          const response = await fetch(
+            `https://yurippe.vercel.app/api/quotes?character=${charName}&random=1`
+          );
+          const result = await response.json();
 
-  // const increment = () => {
-  //   setState(prevState => prevState + 1);
-  //   setState((prevState) => prevState + 1);
-  // }
-
-  // const decremnet = () => {
-  //   setState(state - 1);
-  // };
-
-  // const todos = [
-  //   {
-  //     id: 1,
-  //     value: "Porsche",
-  //   },
-  //   {
-  //     id: 2,
-  //     value: "BMW",
-  //   },
-  //   {
-  //     id: 3,
-  //     value: "Toyota",
-  //   },
-  // ];
-
-  const [todoList, setToDoList] = useState([]);
-  const [input, setInput] = useState("");
-
-  const type = (event) => {
-    const value = event.target.value;
-    setInput(value);
-  };
-
-  const handleAdd = () => {
-    if (input.trim() === "") {
-      return;
+          setQuotes(result);
+        } catch (e) {
+          console.log(e);
+        }
+      };
+      fetchQuote();
     }
-    setToDoList([...todoList, input]);
-    setInput("");
   };
-  console.log(todoList);
+  console.log(quotes);
+
+  const input = () => {
+    const value = event.target.value;
+    setCharName(value);
+    console.log(value);
+  };
 
   return (
     <>
-      {/* <ul>
-        {todos.map((todoItem) => (
-          <li key={todoItem.id}>{todoItem.value}</li>
+      <input type="text" onChange={input} onKeyUp={handleSubmit}></input>
+      <ul>
+        {quotes.map((todoItem) => (
+          <>
+            <li>{todoItem.show}</li>
+            <li>{todoItem.quote}</li>
+            <li>{todoItem.character}</li>
+          </>
         ))}
-      </ul> */}
-      <h1>{input}</h1>
-      <input value={input} type="text" onChange={type}></input>
-      <button onClick={handleAdd}>Add</button>
-      <ol>
-        {todoList.map((todoItem) => (
-          <li>{todoItem}</li>
-        ))}
-      </ol>
+      </ul>
     </>
   );
 }
