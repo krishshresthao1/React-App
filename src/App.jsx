@@ -1,44 +1,71 @@
 import "./App.css";
-import { useEffect, useState } from "react";
-import Counter from "./Counter";
+import { useState } from "react";
+
 function App() {
   const [quotes, setQuotes] = useState([]);
-  const [charName, setCharName] = useState("Byakuya");
-  const handleSubmit = async () => {
-    if (event.key == "Enter") {
-      const fetchQuote = async () => {
-        try {
-          const response = await fetch(
-            `https://yurippe.vercel.app/api/quotes?character=${charName}&random=1`
-          );
-          const result = await response.json();
+  const [charName, setCharName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-          setQuotes(result);
-        } catch (e) {
-          console.log(e);
-        }
-      };
-      fetchQuote();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (!charName.trim()) return;
+
+    try {
+      setLoading(true);
+      setError("");
+
+      const response = await fetch(
+        `https://yurippe.vercel.app/api/quotes?character=${charName}&random=1`
+      );
+
+      if (!response.ok) {
+        throw new Error("Character not found");
+      }
+
+      const result = await response.json();
+      setQuotes(result);
+    } catch (e) {
+      setError(e.message);
+      setQuotes([]);
+    } finally {
+      setLoading(false);
     }
   };
-  console.log(quotes);
 
-  const input = () => {
-    const value = event.target.value;
-    setCharName(value);
-    console.log(value);
+  const handleInput = (event) => {
+    setCharName(event.target.value);
   };
 
   return (
     <>
-      <input type="text" onChange={input} onKeyUp={handleSubmit}></input>
-      <ul>
-        {quotes.map((todoItem) => (
-          <>
-            <li>{todoItem.show}</li>
-            <li>{todoItem.quote}</li>
-            <li>{todoItem.character}</li>
-          </>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          value={charName}
+          onChange={handleInput}
+          placeholder="Enter character name"
+        />
+        <button type="submit">Search</button>
+      </form>
+
+      {loading && <p>Loading...</p>}
+      {error && <p style={{ color: "red" }}>{error}</p>}
+
+      <ul style={{ listStyle: "none", padding: 0 }}>
+        {quotes.map((item, index) => (
+          <li key={index}>
+            <p>
+              <strong>Show:</strong> {item.show}
+            </p>
+            <p>
+              <strong>Quote:</strong> {item.quote}
+            </p>
+            <p>
+              <strong>Character:</strong> {item.character}
+            </p>
+          </li>
         ))}
       </ul>
     </>
